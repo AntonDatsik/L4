@@ -2,25 +2,10 @@
 
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
-<!-- <link rel="stylesheet" type="text/css" href="{{app_dir}}/assets/stylesheets/index.css">
- -->
-<style type="text/css">
-#imaginary_container{
-    margin-top:20%; /* Don't copy this */
-}
-.stylish-input-group .input-group-addon{
-    background: white !important; 
-}
-.stylish-input-group .form-control{
-    border-right:0; 
-	box-shadow:0 0 0; 
-	border-color:#ccc;
-}
-.stylish-input-group button{
-    border:0;
-    background:transparent;
-}
-</style>
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'search/index.css' %}">
+
 <div class="container">
     <div class="row">
         <div class="col-sm-6 col-sm-offset-3">
