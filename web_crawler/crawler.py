@@ -10,7 +10,7 @@ from robotparser import RobotFileParser
 
 DEFAULT_AGENTNAME = 'Bot'
 DEFAULT_LIMIT_WIDTH = 10
-DEFAULT_LIMIT_DEPTH = 100
+DEFAULT_LIMIT_DEPTH = 5
 BAD_CODES = (301, 303, 307, 404, 410, 500, 501, 502, 503, 504)
 
 def benchmark(func):
@@ -32,26 +32,6 @@ class WebCrawler(object):
         self._limit_width = limit_width
         self._limit_depth = limit_depth
         self._agent_name = agent_name
-    
-    @property
-    def limit_depth(self):
-        return self._limit_depth
-
-    @limit_depth.setter
-    def limit_depth(self, value):
-        if not isinstance(value, int):
-            raise TypeError
-        self._limit_depth = value
-    
-    @property
-    def limit_width(self):
-        return self._limit_width
-
-    @limit_width.setter
-    def limit_width(self, value):
-        if not isinstance(value, int):
-            raise TypeError
-        self._limit_width = value
 
     def _allowed_to_open(self, url):
         host = urlparse.urlsplit(url)[1]
@@ -61,10 +41,8 @@ class WebCrawler(object):
             rp.read()
         except:
             return False
-        if not rp.can_fetch(self._agent_name, url):
-            return False
-        return True
-    
+        return rp.can_fetch(self._agent_name, url)
+
     def _request_head(self, url):
         h = httplib2.Http()
         resp = h.request(url, "HEAD")[0]
@@ -97,7 +75,7 @@ class WebCrawler(object):
             except:
                 continue
             soup = BeautifulSoup(htmltext)
-            width = len(temp[level + 1])
+            width = 0
             for tag in soup.findAll('a', href=True):
                 tag['href'] = urlparse.urljoin(start_url, tag['href'])
                 if url in tag['href'] and tag['href'] not in urls:
@@ -115,5 +93,3 @@ if __name__ == "__main__":
     crawler = WebCrawler()
     url = "http://habrahabr.ru"
     print crawler.traverse(url)
-    print crawler.limit_width
-    print crawler.limit_depth
