@@ -5,49 +5,49 @@ from src.build_index import BuildIndex
 from src.html_to_text_converter import HtmlToTextConverter
 
 class SearchEngine:
-	def createIndex(self, url):
-		url = "http://fapl.ru/"
+    def createIndex(self, url):
+        # url = "http://fapl.ru/"
 
-		htmlToTextConverter = HtmlToTextConverter()
+        htmlToTextConverter = HtmlToTextConverter()
 
 
-		text = htmlToTextConverter.transform_html_into_text(url)
+        text = htmlToTextConverter.transform_html_into_text(url)
 
-		print text
+        print text
 
-		buildIndex = BuildIndex(text)
-		index = buildIndex.getIndex()
-		
-		document = Page(url=url)
-		document.save()
-		for word in index.keys():
-			positions = " ".join(str(x) for x in index[word])
-			try:
-				word = Word.objects.get(value=word)
-				word.pages.add(document)
-				word.save()
-			except ObjectDoesNotExist:
-				word = Word(value=word)
-				word.save()
-				word.pages.add(document)
+        buildIndex = BuildIndex(text)
+        index = buildIndex.getIndex()
 
-			match = Match(word=word, pageId=document.id, positions=positions)
-			match.save()
+        document = Page(url=url)
+        document.save()
+        for word in index.keys():
+            positions = " ".join(str(x) for x in index[word])
+            try:
+                word = Word.objects.get(value=word)
+                word.pages.add(document)
+                word.save()
+            except ObjectDoesNotExist:
+                word = Word(value=word)
+                word.save()
+                word.pages.add(document)
 
-	def search_one_word(self, word):
-		result_pages = list()
-		word = str()
-		try:
-			word = Word.objects.get(value=word)			
-		except ObjectDoesNotExist:
-			return result_pages
-			
-		matches = Match.objects.filter(word=word)
-		for match in matches:
-			page = Page.objects.get(id=match.pageId)
-			result_pages.add(page.url)
+            match = Match(word=word, pageId=document.id, positions=positions)
+            match.save()
 
-		return result_pages
+    def search_one_word(self, value):
+        # import pdb; pdb.set_trace()
+        result_pages = []
+        try:
+            word = Word.objects.get(value=value)			
+        except ObjectDoesNotExist:
+            return result_pages
 
-	def search_many_words(self, words):
-		pass
+        matches = Match.objects.filter(word=word)
+        for match in matches:
+            page = Page.objects.get(id=match.pageId)
+            result_pages.append(page.url)
+
+        return result_pages
+
+    def search_many_words(self, words):
+        pass
