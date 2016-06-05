@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'search',
-    'search_engine'
+    'search_engine',
+    'web_crawler'
 ]
 
 
