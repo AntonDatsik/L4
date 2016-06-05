@@ -43,11 +43,12 @@ class SearchEngine:
         value = pattern.sub('', value)
         result_pages = []
         try:
-            word = Word.objects.get(value=value)			
+            word = Word.objects.get(value=value)            
         except ObjectDoesNotExist:
             return result_pages
 
         matches = Match.objects.filter(word=word)
+        print matches
         for match in matches:
             page = Page.objects.get(id=match.page_id)
             result_pages.append(page.url)
@@ -100,6 +101,48 @@ class SearchEngine:
             res = EPS
         return res
 
+    def doc_phrase_weight(self, words_positions):
+        words_positions_pointers = {}
+        for word in words_positions.keys():
+            words_positions_pointers[word] = 0
+
+        words = words_positions.keys()    
+        words_count = len(words)
+
+        result_length = 0
+
+        for i in range(0, words_count - 1):
+
+            current_word = words[i]
+            while words_positions_pointers[current_word] < len(words_positions[current_word]):            
+
+                last_position = words_positions[current_word][words_positions_pointers[current_word]] 
+
+                j = i + 1
+                while j < words_count:
+                    next_word = words[j]
+                    positions = words_positions[next_word]
+                    position_pointer = words_positions_pointers[next_word]
+                    while position_pointer < len(positions) - 1 and positions[position_pointer] < last_position:
+                        position_pointer += 1
+
+                    if positions[position_pointer] == last_position + 1:
+                        result_length += 1
+                        last_position += 1
+                        
+                        if len(words_positions[next_word]) <= position_pointer:
+                            break
+                        
+                        words_positions_pointers[next_word] = position_pointer
+                        j += 1
+                    else:
+                        break
+                    last_position = words_positions[next_word][words_positions_pointers[next_word]]
+
+                words_positions_pointers[current_word] += 1
+
+        return result_length
+
     def rank_results(self, words, urls):
         # import pdb; pdb.set_trace()
         scores = {}
@@ -113,6 +156,7 @@ class SearchEngine:
         average_size_of_document /= N
         for url in urls:
             score = 0.0
+            words_positions = {}
             for w in words:
                 word = Word.objects.get(value=w)
                 n = word.pages.count()
@@ -121,14 +165,20 @@ class SearchEngine:
                     continue
                 page = Page.objects.get(url=url)
                 number_of_words_on_page = page.word_set.count()
-                number_of_occurrences = len(Match.objects.get(page=page,
-                                            word=word).positions.split())
+                current_word_positions = Match.objects.get(page=page, word=word).positions.split()
+                number_of_occurrences = len(current_word_positions)
+                words_positions[word] = current_word_positions
                 frequency = number_of_occurrences * 1.0 / number_of_words_on_page
                 r = frequency * (k1 + 1) / (frequency + \
                     k1 * (1 - b + b * number_of_words_on_page * 1.0 \
                     / average_size_of_document))
                 score += r * idf
-            scores[url] = score
+
+                doc_phrase_weight = self.doc_phrase_weight(words_positions)
+
+            scores[url] = doc_phrase_weight*1000 + score*999
+        # Now we have bm25 for all documents
+
         sorted_by_score_urls = sorted(scores.items(), key=operator.itemgetter(1),
                                     reverse=True)
         res = []
