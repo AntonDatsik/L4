@@ -1,8 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.template import loader, RequestContext
-
-import os.path
+from django.template import loader
 
 from search_engine.search_engine import SearchEngine
 
