@@ -82,8 +82,8 @@ WSGI_APPLICATION = 'search_system.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'search_system',
-        'USER': 'antoha',
+        'NAME': 'search_system_database',
+        'USER': 'search_system',
         'PASSWORD': 'supersecretpass',
         'HOST': 'localhost',
         'PORT': '',
