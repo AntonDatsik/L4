@@ -4,8 +4,13 @@ from django.template import loader, RequestContext
 
 import os.path
 
+from search_engine.search_engine import SearchEngine
+
 
 def index(request):
+	search_engine = SearchEngine()
+	search_engine.createIndex("https://google.com/")
+
 	template = loader.get_template('index.html')
 	context = RequestContext(request)
 	return HttpResponse(template.render(context))
