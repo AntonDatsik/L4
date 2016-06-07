@@ -26,7 +26,8 @@ class Migration(migrations.Migration):
             name='Page',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField()),
+                ('url', models.URLField(unique=True)),
+                ('number_of_words', models.IntegerField(default=0)),
             ],
         ),
         migrations.CreateModel(

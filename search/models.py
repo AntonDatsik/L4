@@ -5,9 +5,10 @@ from django.db import models
 
 class Page(models.Model):
     url = models.URLField(unique=True)
+    number_of_words = models.IntegerField(default=0)
 
     def __unicode__(self):
-        return self.url
+        return "url={}, number_of_words={}".format(self.url, self.number_of_words)
 
 
 class Word(models.Model):
